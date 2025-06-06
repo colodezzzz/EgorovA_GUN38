@@ -4117,9 +4117,9 @@ GameObject:
   - component: {fileID: 8921102106455759527}
   - component: {fileID: 8921102106455759529}
   - component: {fileID: 8921102106455759528}
-  - component: {fileID: 8921102106455759532}
   - component: {fileID: 8921102106455759531}
   - component: {fileID: 8921102106455759530}
+  - component: {fileID: 8921102106455759532}
   m_Layer: 0
   m_Name: TankFree
   m_TagString: Untagged
@@ -4764,10 +4764,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _wheels:
-  - {fileID: 8849521607226460048}
-  - {fileID: 8952005301059220153}
   - {fileID: 5169811322308212650}
   - {fileID: 5348468450806359728}
+  - {fileID: 8849521607226460048}
+  - {fileID: 8952005301059220153}
   _skidAudioSource: {fileID: 8921102106455759530}
   _transmission: {fileID: 11400000, guid: cabb7876cba1d9f4cab186531180bd4d, type: 2}
   _maxSteerAngle: 25
@@ -4788,11 +4788,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1293169254191608124}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2b3e21422e254466810369536a65b19b, type: 3}
+  m_Script: {fileID: 11500000, guid: 6213543e868e4a008eaa9de7f85ad61e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _accelerationPower: 1
-  _fireDelaySec: 1
+  _rotateSpeed: 1
 --- !u!23 &8952005301059220152
 MeshRenderer:
   m_ObjectHideFlags: 0
