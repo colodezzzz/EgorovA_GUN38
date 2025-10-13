@@ -1,34 +1,35 @@
 using System.Collections;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Mover : MonoBehaviour
 {
-	[SerializeField]
-	private float _moveTime = 1f;
-	[SerializeField]
-	private float _delayTime = 2f;
-	[SerializeField]
-	private Vector3[] _positions;
+	[SerializeField] private Vector3 _start;
+	[SerializeField] private Vector3 _end;
 
-	private IEnumerator Start()
+    [SerializeField] private float _speed;
+    [SerializeField] private float _delay;
+
+    private IEnumerator Start()
     {
-		if(_positions.Length < 2) yield break;
-		int prev = 0, curr = 1;
-		var time = 0f;
-		var transform = this.transform;
-		while(true)
-		{
-			transform.position = Vector3.Lerp(_positions[prev], _positions[curr], time / _moveTime);
-			time += Time.deltaTime;
-			if(time >= _moveTime)
-			{
-				time = 0f;
-				prev = curr;
-				curr = (curr + 1) % _positions.Length;
-				yield return new WaitForSeconds(_delayTime);
-			}
+		Rigidbody rigidbody = GetComponent<Rigidbody>();
+		Vector3[] points = new Vector3[] { _start, _end };
+		int targetIndex = points.Length - 1;
+        Vector3 direction = transform.position - points[targetIndex];
 
-			yield return null;
-		}
-	}
+        while (true)
+		{
+			yield return new WaitForFixedUpdate();
+			rigidbody.velocity = direction.normalized * _speed;
+
+			if (Vector3.Distance(transform.position, points[targetIndex]) < 0.1f)
+			{
+				rigidbody.position = points[targetIndex];
+				yield return new WaitForSeconds(_delay);
+
+				targetIndex = (targetIndex + 1) % points.Length;
+                direction = transform.position - points[targetIndex];
+            }
+        }
+    }
 }
