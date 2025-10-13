@@ -15,7 +15,7 @@ public class Mover : MonoBehaviour
 		Rigidbody rigidbody = GetComponent<Rigidbody>();
 		Vector3[] points = new Vector3[] { _start, _end };
 		int targetIndex = points.Length - 1;
-        Vector3 direction = transform.position - points[targetIndex];
+        Vector3 direction = points[targetIndex] - transform.position;
 
         while (true)
 		{
