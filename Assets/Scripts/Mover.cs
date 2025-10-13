@@ -20,7 +20,7 @@ public class Mover : MonoBehaviour
         while (true)
 		{
 			yield return new WaitForFixedUpdate();
-			rigidbody.velocity = direction.normalized * _speed;
+			rigidbody.position += direction.normalized * _speed * Time.fixedDeltaTime;
 
 			if (Vector3.Distance(transform.position, points[targetIndex]) < 0.1f)
 			{
@@ -28,7 +28,7 @@ public class Mover : MonoBehaviour
 				yield return new WaitForSeconds(_delay);
 
 				targetIndex = (targetIndex + 1) % points.Length;
-                direction = transform.position - points[targetIndex];
+                direction = points[targetIndex] - transform.position;
             }
         }
     }

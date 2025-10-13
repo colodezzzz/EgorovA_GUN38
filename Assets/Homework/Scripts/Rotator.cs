@@ -8,11 +8,9 @@ public class Rotator : MonoBehaviour
 
     private IEnumerator Start()
     {
-        Rigidbody rigidbody = GetComponent<Rigidbody>();
-
         while (true)
         {
-            rigidbody.rotation = Quaternion.Lerp(rigidbody.rotation, Quaternion.LookRotation(_rotate), Time.deltaTime);
+            transform.Rotate(_rotate * Time.deltaTime);
             yield return null;
         }
     }
