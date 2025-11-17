@@ -1,16 +1,19 @@
 using UnityEngine;
-using UnityEngine.UIElements;
 using Utils;
 
 public class GameManager : MonoBehaviour
 {
+    [Header("Main Settings")]
     [SerializeField] private Vector2Int _boardSize;
     [SerializeField] private Transform _cellsContainer;
+    [SerializeField] private VisualManager _visualManager;
 
-    private Board _board;
+    [Header("Additional Settings")]
+    [SerializeField] private Board _board;
+
     private FigureMovement _figureMovement;
-    private bool IsFigureChose = false;
-    private Vector2Int _choseFigurePosition;
+    [SerializeField] private bool IsFigureChose = false;
+    [SerializeField] private Vector2Int _choseFigurePosition;
 
     private void Awake()
     {
@@ -31,6 +34,8 @@ public class GameManager : MonoBehaviour
                 cell.OnClick += Cell_OnClick;
             }
         }
+
+        _visualManager.Initialize(_board);
     }
 
     private void Cell_OnClick(Vector2Int position)

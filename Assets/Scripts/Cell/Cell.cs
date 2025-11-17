@@ -6,6 +6,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public event System.Action<Vector2Int> OnClick;
 
     [SerializeField] private GameObject _selectedPlane;
+    [SerializeField] private GameObject _turnPlane;
 
     private Vector2Int _position;
 
@@ -28,5 +29,15 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public void OnPointerExit(PointerEventData eventData)
     {
         _selectedPlane.SetActive(false);
+    }
+
+    public void ShowTurnPanel()
+    {
+        _turnPlane.SetActive(true);
+    }
+
+    public void HideTurnPanel()
+    {
+        _turnPlane.SetActive(false);
     }
 }
