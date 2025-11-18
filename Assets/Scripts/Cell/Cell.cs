@@ -8,17 +8,17 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     [SerializeField] private GameObject _selectedPlane;
     [SerializeField] private GameObject _turnPlane;
 
-    private Vector2Int _position;
+    public Vector2Int Position { get; private set; }
 
     public void Initialize(Vector2Int position)
     {
-        _position = position;
+        Position = position;
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         // TODO: Передавать какие-то аргументы
-        OnClick?.Invoke(_position);
+        OnClick?.Invoke(Position);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

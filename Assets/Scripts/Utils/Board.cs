@@ -1,5 +1,7 @@
 using System;
+using System.Drawing;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Utils
 {
@@ -11,6 +13,9 @@ namespace Utils
         public event Action<Vector2Int, Figure> OnChangePawn;
 
         public readonly Vector2Int Size;
+
+        public Vector2Int WhiteKingPosition { get; private set; }
+        public Vector2Int BlackKingPosition { get; private set; }
 
         [TextArea(8, 8)] public string BoardString;
 
@@ -36,6 +41,12 @@ namespace Utils
             Fill(boardString);
 
             ShowBoardConsole();
+        }
+
+        public Board(Figure[,] board)
+        {
+            Size = new Vector2Int(board.GetLength(0), board.GetLength(1));
+            _board = board;
         }
 
         public void ShowBoardConsole()
@@ -64,6 +75,18 @@ namespace Utils
         {
             _board[newPosition.x, newPosition.y] = _board[oldPosition.x, oldPosition.y];
             _board[oldPosition.x, oldPosition.y] = null;
+
+            if (_board[newPosition.x, newPosition.y].Type == FigureType.King)
+            {
+                if (_board[newPosition.x, newPosition.y].Team == Team.White)
+                {
+                    WhiteKingPosition = newPosition;
+                }
+                else
+                {
+                    BlackKingPosition = newPosition;
+                }
+            }
 
             OnMoveFigure?.Invoke(oldPosition, newPosition);
             ShowBoardConsole();
@@ -107,6 +130,18 @@ namespace Utils
                 {
                     Team team = x > 1 ? Team.Black : Team.White;
                     _board[x, y] = GetFigureByString(figures[x][y].ToString(), team);
+
+                    if (_board[x, y].Type == FigureType.King)
+                    {
+                        if (team == Team.White)
+                        {
+                            WhiteKingPosition = new Vector2Int(x, y);
+                        }
+                        else
+                        {
+                            BlackKingPosition = new Vector2Int(x, y);
+                        }
+                    }
                 }
             }
         }

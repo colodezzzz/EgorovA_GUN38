@@ -36,13 +36,13 @@ public class VisualManager : MonoBehaviour
         if (figure != null)
         {
             Transform fig = _figuresData.GetFigure(figure);
-            _figures[position.x, position.y] = Instantiate(fig, GetWorldPosition(position), Quaternion.identity, _figuresContainer);
+            _figures[position.x, position.y] = Instantiate(fig, GetWorldPosition(position), Quaternion.Euler(0f, 180f, 0f), _figuresContainer);
         }
     }
 
     private Vector3 GetWorldPosition(Vector2Int position)
     {
-        return _startPosition.position + new Vector3(_spacing.x * position.x, 0f, _spacing.y * position.y);
+        return _startPosition.position + new Vector3(_spacing.y * position.y, 0f, -1 * _spacing.x * position.x);
     }
 
     private void Board_OnChangePawn(Vector2Int position, Figure figure)
@@ -52,7 +52,7 @@ public class VisualManager : MonoBehaviour
 
     private void Board_OnDeleteFigure(Vector2Int position)
     {
-        Destroy(_figures[position.x, position.y]);
+        Destroy(_figures[position.x, position.y].gameObject);
     }
 
     private void Board_OnMoveFigure(Vector2Int oldPosition, Vector2Int newPosition)
