@@ -1,7 +1,5 @@
 using System;
-using System.Drawing;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 namespace Utils
 {
@@ -67,13 +65,13 @@ namespace Utils
 
         public void MoveFigure(Vector2Int oldPosition, Vector2Int newPosition)
         {
-            if (IsPositionCorrect(oldPosition))
+            if (IsPositionCorrect(oldPosition) == false)
             {
-                Debug.LogError("Old position is not correct!");
+                Debug.LogError($"Old position is not correct!");
                 return;
             }
 
-            if (IsPositionCorrect(newPosition))
+            if (IsPositionCorrect(newPosition) == false)
             {
                 Debug.LogError("New position is not correct!");
                 return;
@@ -88,7 +86,7 @@ namespace Utils
 
         public void DeleteFigure(Vector2Int position)
         {
-            if (IsPositionCorrect(position))
+            if (IsPositionCorrect(position) == false)
             {
                 Debug.LogError("Position is not correct!");
                 return;
@@ -101,7 +99,7 @@ namespace Utils
 
         public void ChangeToKing(Vector2Int position)
         {
-            if (IsPositionCorrect(position))
+            if (IsPositionCorrect(position) == false)
             {
                 Debug.LogError("Position is not correct!");
                 return;
@@ -113,6 +111,19 @@ namespace Utils
         public Figure GetFigureByPosition(Vector2Int position)
         {
             return _board[position.x, position.y];
+        }
+
+        public bool IsPositionCorrect(Vector2Int position)
+        {
+            if (position.x < 0
+                || position.x >= Size.x
+                || position.y < 0
+                || position.y >= Size.y)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         private void Fill(string[] figures)
@@ -137,22 +148,8 @@ namespace Utils
                     return new Figure(FigureType.Checker, Team.Black, figureChar);
 
                 default:
-                    Debug.LogError("Unknown figure char!");
                     return null;
             }
-        }
-
-        private bool IsPositionCorrect(Vector2Int position)
-        {
-            if (position.x < 0 
-                || position.x >= _board.GetLength(0) 
-                || position.y < 0 
-                || position.y >= _board.GetLength(1))
-            {
-                return false;
-            }
-
-            return true;
         }
     }
 }
