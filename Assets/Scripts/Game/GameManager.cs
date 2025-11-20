@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Vector2Int _boardSize;
     [SerializeField] private Transform _cellsContainer;
     [SerializeField] private VisualManager _visualManager;
+    [SerializeField] private UIManager _uiManager;
 
     [Header("Additional Settings")]
     [SerializeField] private Board _board;
@@ -48,6 +49,9 @@ public class GameManager : MonoBehaviour
         }
 
         _visualManager.Initialize(_board);
+        _uiManager.Initialize(this);
+
+        OnTeamChange?.Invoke(_currenTeamTurn);
     }
 
     private void Cell_OnClick(Vector2Int position)
@@ -64,6 +68,7 @@ public class GameManager : MonoBehaviour
             if (TryTurn(position))
             {
                 _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
+                OnTeamChange?.Invoke(_currenTeamTurn);
             }
             
             IsFigureChose = false;
@@ -93,11 +98,13 @@ public class GameManager : MonoBehaviour
         {
             OnGameEnd?.Invoke(Team.White);
             IsGameEnd = true;
+            return;
         }
         else if (_board.BlackCheckersCount == 0)
         {
             OnGameEnd?.Invoke(Team.Black);
             IsGameEnd = true;
+            return;
         }
         else
         {

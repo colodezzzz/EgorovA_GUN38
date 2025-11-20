@@ -168,18 +168,21 @@ namespace Utils
                 {
                     _board[x, y] = GetFigureByString(figures[x][y].ToString());
 
-                    switch (_board[x, y].Team)
+                    if (_board[x, y] != null)
                     {
-                        case Team.White:
-                            WhiteCheckersCount++;
-                            break;
+                        switch (_board[x, y].Team)
+                        {
+                            case Team.White:
+                                WhiteCheckersCount++;
+                                break;
 
-                        case Team.Black:
-                            BlackCheckersCount++;
-                            break;
+                            case Team.Black:
+                                BlackCheckersCount++;
+                                break;
 
-                        default:
-                            break;
+                            default:
+                                break;
+                        }
                     }
                 }
             }
