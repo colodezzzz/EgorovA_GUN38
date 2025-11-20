@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
 using Utils;
 
 public class GameManager : MonoBehaviour
 {
+    public event Action<Team> OnGameEnd;
     public event Action<Team> OnTeamChange;
 
     [Header("Main Settings")]
@@ -21,16 +20,18 @@ public class GameManager : MonoBehaviour
     private bool IsFigureChose = false;
     private Vector2Int _choseFigurePosition;
 
-    private List<Cell> _availableCells = new List<Cell>();
     private List<Vector2Int> _availableTurns = new List<Vector2Int>();
 
     private Team _currenTeamTurn = Team.White;
+    private bool IsGameEnd;
 
     private void Awake()
     {
         Vector2Int size = new Vector2Int(_boardSize.y, _boardSize.x);
 
         _board = new Board(size);
+        _board.OnDeleteFigure += Board_OnDeleteFigure;
+
         _figureMovement = new FigureMovement(_board);
     }
 
@@ -51,10 +52,22 @@ public class GameManager : MonoBehaviour
 
     private void Cell_OnClick(Vector2Int position)
     {
+        if (IsGameEnd)
+        {
+            return;
+        }
+
+        HideAvailableTurns();
+
         if (IsFigureChose)
         {
-            Turn(position);
+            if (TryTurn(position))
+            {
+                _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
+            }
+            
             IsFigureChose = false;
+            _availableTurns.Clear();
         }
         else
         {
@@ -62,21 +75,77 @@ public class GameManager : MonoBehaviour
 
             if (figure != null && figure.Team == _currenTeamTurn)
             {
-                _choseFigurePosition = position;
-                IsFigureChose = true;
+                _availableTurns = _figureMovement.GetTurns(figure, position);
+                ShowAvailableTurns();
+
+                if (_availableTurns.Count > 0)
+                {
+                    _choseFigurePosition = position;
+                    IsFigureChose = true;
+                }
             }
         }
     }
 
-    private void Turn(Vector2Int position)
+    private void Board_OnDeleteFigure(Vector2Int position)
     {
-        // TODO:
-        // Проверка - обычный ход или можно съесть
-        // Если обычный ход, то ход переходит к сопернику
-        // Если можно съесть, то ход не заканчивается, а вновь даётся выбор
-        if (_board.GetFigureByPosition(position) == null)
+        if (_board.WhiteCheckersCount == 0)
+        {
+            OnGameEnd?.Invoke(Team.White);
+            IsGameEnd = true;
+        }
+        else if (_board.BlackCheckersCount == 0)
+        {
+            OnGameEnd?.Invoke(Team.Black);
+            IsGameEnd = true;
+        }
+        else
+        {
+            Debug.LogError("Game is end but anyone has 0 checkers!");
+        }
+    }
+
+    private bool TryTurn(Vector2Int position)
+    {
+        if (_availableTurns.Contains(position))
         {
             _board.MoveFigure(_choseFigurePosition, position);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ShowAvailableTurns()
+    {
+        foreach (Vector2Int pos in _availableTurns)
+        {
+            if (_cellsContainer.GetChild(pos.x * _board.Size.y + pos.y).TryGetComponent(out Cell cell))
+            {
+                cell.ShowTurnPanel();
+            }
+        }
+    }
+
+    private void HideAvailableTurns()
+    {
+        foreach (Vector2Int pos in _availableTurns)
+        {
+            if (_cellsContainer.GetChild(pos.x * _board.Size.y + pos.y).TryGetComponent(out Cell cell))
+            {
+                cell.HideTurnPanel();
+            }
+        }
+    }
+
+    private void UnsubscribeFromCells()
+    {
+        for (int i = 0; i < _cellsContainer.childCount; i++)
+        {
+            if (_cellsContainer.GetChild(i).TryGetComponent(out Cell cell))
+            {
+                cell.OnClick -= Cell_OnClick;
+            }
         }
     }
 }

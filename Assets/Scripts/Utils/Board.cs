@@ -19,6 +19,9 @@ namespace Utils
 
         private Figure[,] _board;
 
+        public int WhiteCheckersCount { get; private set; } = 0;
+        public int BlackCheckersCount { get; private set; } = 0;
+
         public Board(Vector2Int size)
         {
             Size = size;
@@ -81,6 +84,19 @@ namespace Utils
             _board[oldPosition.x, oldPosition.y] = null;
 
             OnMoveFigure?.Invoke(oldPosition, newPosition);
+
+            if (newPosition.x == 0 || newPosition.x == Size.x - 1)
+            {
+                ChangeToKing(newPosition);
+            }
+
+            Vector2Int direction = new Vector2Int((int)Mathf.Sign(newPosition.x - oldPosition.x), (int)Mathf.Sign(newPosition.y - oldPosition.y));
+
+            if (GetFigureByPosition(newPosition - direction) != null)
+            {
+                DeleteFigure(newPosition - direction);
+            }
+
             ShowBoardConsole();
         }
 
@@ -90,6 +106,20 @@ namespace Utils
             {
                 Debug.LogError("Position is not correct!");
                 return;
+            }
+
+            switch (_board[position.x, position.y].Team)
+            {
+                case Team.White:
+                    WhiteCheckersCount--;
+                    break;
+
+                case Team.Black:
+                    BlackCheckersCount--;
+                    break;
+
+                default:
+                    break;
             }
 
             _board[position.x, position.y] = null;
@@ -106,6 +136,10 @@ namespace Utils
             }
 
             // Превратить шашку в дамку
+            Figure figure = GetFigureByPosition(position);
+            figure.Type = FigureType.King;
+
+            OnChangeToKing?.Invoke(position, figure);
         }
 
         public Figure GetFigureByPosition(Vector2Int position)
@@ -133,6 +167,20 @@ namespace Utils
                 for (int y = 0; y < figures[x].Length; y++)
                 {
                     _board[x, y] = GetFigureByString(figures[x][y].ToString());
+
+                    switch (_board[x, y].Team)
+                    {
+                        case Team.White:
+                            WhiteCheckersCount++;
+                            break;
+
+                        case Team.Black:
+                            BlackCheckersCount++;
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
             }
         }

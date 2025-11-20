@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: FiguresData
   m_EditorClassIdentifier: 
   _whiteCheckerPrefab: {fileID: 6281863528349854832, guid: 6868dedef7c298040ae84cafb7cc9b64, type: 3}
-  _whiteKingPrefab: {fileID: 0}
+  _whiteKingPrefab: {fileID: 6289601805909951258, guid: 88c1a632051897a4aa7c8efe1946203d, type: 3}
   _blackCheckerPrefab: {fileID: 3365898447268833309, guid: 3b2b350fdf2b61c4da2f27adf0b00e2b, type: 3}
-  _blackKingPrefab: {fileID: 0}
+  _blackKingPrefab: {fileID: 3532276036677491096, guid: d0536164d6fd37048bfd5a71a20d74c1, type: 3}
