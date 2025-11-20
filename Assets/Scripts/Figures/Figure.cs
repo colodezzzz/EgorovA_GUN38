@@ -2,9 +2,28 @@ using Utils;
 
 public class Figure
 {
-    public FigureType Type;
+    public FigureType Type
+    {
+        get
+        {
+            return _type;
+        }
+
+        set
+        {
+            if (value != FigureType.None)
+            {
+                UnityEngine.Debug.LogError("Can't change type to \"None\"!");
+                _type = value;
+            }
+        }
+    }
+
+
     public readonly Team Team;
     public readonly string Sign;
+
+    private FigureType _type;
 
     public Figure(FigureType type, Team team)
     {

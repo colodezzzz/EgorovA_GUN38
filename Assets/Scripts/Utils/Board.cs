@@ -28,25 +28,19 @@ namespace Utils
 
             string[] boardString =
             {
-                "rkbqKbkr",
-                "pppppppp",
+                "nbnbnbnb",
+                "bnbnbnbn",
+                "nbnbnbnb",
                 "nnnnnnnn",
                 "nnnnnnnn",
-                "nnnnnnnn",
-                "nnnnnnnn",
-                "pppppppp",
-                "rkbKqbkr",
+                "wnwnwnwn",
+                "nwnwnwnw",
+                "wnwnwnwn",
             };
 
             Fill(boardString);
 
             ShowBoardConsole();
-        }
-
-        public Board(Figure[,] board)
-        {
-            Size = new Vector2Int(board.GetLength(0), board.GetLength(1));
-            _board = board;
         }
 
         public void ShowBoardConsole()
@@ -73,6 +67,18 @@ namespace Utils
 
         public void MoveFigure(Vector2Int oldPosition, Vector2Int newPosition)
         {
+            if (IsPositionCorrect(oldPosition))
+            {
+                Debug.LogError("Old position is not correct!");
+                return;
+            }
+
+            if (IsPositionCorrect(newPosition))
+            {
+                Debug.LogError("New position is not correct!");
+                return;
+            }
+
             _board[newPosition.x, newPosition.y] = _board[oldPosition.x, oldPosition.y];
             _board[oldPosition.x, oldPosition.y] = null;
 
@@ -82,6 +88,12 @@ namespace Utils
 
         public void DeleteFigure(Vector2Int position)
         {
+            if (IsPositionCorrect(position))
+            {
+                Debug.LogError("Position is not correct!");
+                return;
+            }
+
             _board[position.x, position.y] = null;
             OnDeleteFigure?.Invoke(position);
             ShowBoardConsole();
@@ -89,7 +101,13 @@ namespace Utils
 
         public void ChangeToKing(Vector2Int position)
         {
-            
+            if (IsPositionCorrect(position))
+            {
+                Debug.LogError("Position is not correct!");
+                return;
+            }
+
+            // Превратить шашку в дамку
         }
 
         public Figure GetFigureByPosition(Vector2Int position)
@@ -103,21 +121,38 @@ namespace Utils
             {
                 for (int y = 0; y < figures[x].Length; y++)
                 {
-                    
+                    _board[x, y] = GetFigureByString(figures[x][y].ToString());
                 }
             }
         }
 
-        private Figure GetFigureByString(string figure, Team team)
+        private Figure GetFigureByString(string figureChar)
         {
-            switch (figure)
+            switch (figureChar)
             {
-                
+                case "w":
+                    return new Figure(FigureType.Checker, Team.White, figureChar);
+
+                case "b":
+                    return new Figure(FigureType.Checker, Team.Black, figureChar);
 
                 default:
                     Debug.LogError("Unknown figure char!");
                     return null;
             }
+        }
+
+        private bool IsPositionCorrect(Vector2Int position)
+        {
+            if (position.x < 0 
+                || position.x >= _board.GetLength(0) 
+                || position.y < 0 
+                || position.y >= _board.GetLength(1))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }
