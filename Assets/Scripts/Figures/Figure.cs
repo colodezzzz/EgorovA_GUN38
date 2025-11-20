@@ -13,8 +13,11 @@ public class Figure
         {
             if (value != FigureType.None)
             {
-                UnityEngine.Debug.LogError("Can't change type to \"None\"!");
                 _type = value;
+            }
+            else
+            {
+                UnityEngine.Debug.LogError("Can't change type to \"None\"!");
             }
         }
     }

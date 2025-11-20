@@ -36,7 +36,7 @@ public class VisualManager : MonoBehaviour
         if (figure != null)
         {
             Transform fig = _figuresData.GetFigure(figure);
-            _figures[position.x, position.y] = Instantiate(fig, GetWorldPosition(position), Quaternion.Euler(0f, 180f, 0f), _figuresContainer);
+            _figures[position.x, position.y] = Instantiate(fig, GetWorldPosition(position), Quaternion.Euler(0f, 0f, 0f), _figuresContainer);
         }
     }
 
@@ -47,6 +47,7 @@ public class VisualManager : MonoBehaviour
 
     private void Board_OnChangeToKing(Vector2Int position, Figure figure)
     {
+        Board_OnDeleteFigure(position);
         CreateFigure(position, figure);
     }
 
