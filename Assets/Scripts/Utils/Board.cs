@@ -10,7 +10,7 @@ namespace Utils
     {
         public event Action<Vector2Int, Vector2Int> OnMoveFigure;
         public event Action<Vector2Int> OnDeleteFigure;
-        public event Action<Vector2Int, Figure> OnChangePawn;
+        public event Action<Vector2Int, Figure> OnChangeToKing;
 
         public readonly Vector2Int Size;
 
@@ -76,18 +76,6 @@ namespace Utils
             _board[newPosition.x, newPosition.y] = _board[oldPosition.x, oldPosition.y];
             _board[oldPosition.x, oldPosition.y] = null;
 
-            if (_board[newPosition.x, newPosition.y].Type == FigureType.King)
-            {
-                if (_board[newPosition.x, newPosition.y].Team == Team.White)
-                {
-                    WhiteKingPosition = newPosition;
-                }
-                else
-                {
-                    BlackKingPosition = newPosition;
-                }
-            }
-
             OnMoveFigure?.Invoke(oldPosition, newPosition);
             ShowBoardConsole();
         }
@@ -99,22 +87,9 @@ namespace Utils
             ShowBoardConsole();
         }
 
-        public void ChangePawn(Vector2Int position, FigureType newType)
+        public void ChangeToKing(Vector2Int position)
         {
-            if (_board[position.x, position.y].Type != FigureType.Pawn)
-            {
-                Debug.LogError("Figure is not PAWN!");
-                return;
-            }
-
-            if (position.x == 0 || position.x == Size.x-1)
-            {
-                DeleteFigure(position);
-                _board[position.x, position.y].Type = newType;
-                OnChangePawn?.Invoke(position, _board[position.x, position.y]);
-            }
-
-            ShowBoardConsole();
+            
         }
 
         public Figure GetFigureByPosition(Vector2Int position)
@@ -128,20 +103,7 @@ namespace Utils
             {
                 for (int y = 0; y < figures[x].Length; y++)
                 {
-                    Team team = x > 1 ? Team.Black : Team.White;
-                    _board[x, y] = GetFigureByString(figures[x][y].ToString(), team);
-
-                    if (_board[x, y].Type == FigureType.King)
-                    {
-                        if (team == Team.White)
-                        {
-                            WhiteKingPosition = new Vector2Int(x, y);
-                        }
-                        else
-                        {
-                            BlackKingPosition = new Vector2Int(x, y);
-                        }
-                    }
+                    
                 }
             }
         }
@@ -150,26 +112,7 @@ namespace Utils
         {
             switch (figure)
             {
-                case "n":
-                    return null;
-
-                case "p":
-                    return new Figure(FigureType.Pawn, team, figure);
-
-                case "r":
-                    return new Figure(FigureType.Rook, team, figure);
-
-                case "k":
-                    return new Figure(FigureType.Knight, team, figure);
-
-                case "b":
-                    return new Figure(FigureType.Bishop, team, figure);
-
-                case "q":
-                    return new Figure(FigureType.Queen, team, figure);
-
-                case "K":
-                    return new Figure(FigureType.King, team, figure);
+                
 
                 default:
                     Debug.LogError("Unknown figure char!");

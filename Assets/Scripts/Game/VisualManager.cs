@@ -15,7 +15,7 @@ public class VisualManager : MonoBehaviour
     {
         board.OnMoveFigure += Board_OnMoveFigure;
         board.OnDeleteFigure += Board_OnDeleteFigure;
-        board.OnChangePawn += Board_OnChangePawn;
+        board.OnChangeToKing += Board_OnChangeToKing;
 
         // Создание фигур
         _figures = new Transform[board.Size.x, board.Size.y];
@@ -45,7 +45,7 @@ public class VisualManager : MonoBehaviour
         return _startPosition.position + new Vector3(_spacing.y * position.y, 0f, -1 * _spacing.x * position.x);
     }
 
-    private void Board_OnChangePawn(Vector2Int position, Figure figure)
+    private void Board_OnChangeToKing(Vector2Int position, Figure figure)
     {
         CreateFigure(position, figure);
     }
