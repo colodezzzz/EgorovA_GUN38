@@ -73,11 +73,21 @@ public class GameManager : MonoBehaviour
         {
             if (TryTurn(position))
             {
-                ChangeTeam();
                 _availableFigures.Clear();
 
+                if (_currentTurnState == TurnState.Attack)
+                {
+                    if (_figureMovement.GetAttackTurns(_board.GetFigureByPosition(position), position).Count == 0)
+                    {
+                        ChangeTeam();
+                    }
+                }
+                else
+                {
+                    ChangeTeam();
+                }
+                
                 // Завершение хода
-                // ТУДУ: Проверять возможные шашки для хода. Сначала атакующие, если таких нет, то обычные.
                 _availableFigures = GetAvailableFigures();
                 ShowAvailableFigures();
             }
@@ -93,10 +103,12 @@ public class GameManager : MonoBehaviour
             if (_availableFigures.Contains(position) && figure != null && figure.Team == _currenTeamTurn)
             {
                 _availableTurns = _figureMovement.GetAttackTurns(figure, position);
+                _currentTurnState = TurnState.Attack;
 
                 if (_availableTurns.Count == 0)
                 {
                     _availableTurns = _figureMovement.GetSimpleTurns(figure, position);
+                    _currentTurnState = TurnState.Simple;
                 }
 
                 HideAvailableFigures();
@@ -148,7 +160,18 @@ public class GameManager : MonoBehaviour
 
     private void Board_OnDeleteFigure(Vector2Int position)
     {
-        if (_board.WhiteCheckersCount == 0)
+        CheckEndGame();
+    }
+
+    private void CheckEndGame()
+    {
+        if (GetAvailableFigures().Count == 0)
+        {
+            _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
+            OnGameEnd?.Invoke(_currenTeamTurn);
+            _isGameEnd = true;
+        }
+        else if (_board.WhiteCheckersCount == 0)
         {
             OnGameEnd?.Invoke(Team.White);
             _isGameEnd = true;
@@ -157,10 +180,6 @@ public class GameManager : MonoBehaviour
         {
             OnGameEnd?.Invoke(Team.Black);
             _isGameEnd = true;
-        }
-        else
-        {
-
         }
     }
 
@@ -178,6 +197,7 @@ public class GameManager : MonoBehaviour
     private void ChangeTeam()
     {
         _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
+        CheckEndGame();
         OnTeamChange?.Invoke(_currenTeamTurn);
     }
 
