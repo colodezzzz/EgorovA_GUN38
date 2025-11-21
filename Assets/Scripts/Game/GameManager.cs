@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
+using static UnityEditor.PlayerSettings;
 
 public class GameManager : MonoBehaviour
 {
@@ -22,9 +23,11 @@ public class GameManager : MonoBehaviour
     private Vector2Int _choseFigurePosition;
 
     private List<Vector2Int> _availableTurns = new List<Vector2Int>();
+    private List<Vector2Int> _availableFigures = new List<Vector2Int>();
 
     private Team _currenTeamTurn = Team.White;
-    private bool IsGameEnd;
+    private bool _isGameEnd;
+    private TurnState _currentTurnState = TurnState.Simple;
 
     private void Awake()
     {
@@ -52,11 +55,14 @@ public class GameManager : MonoBehaviour
         _uiManager.Initialize(this);
 
         OnTeamChange?.Invoke(_currenTeamTurn);
+
+        _availableFigures = GetAvailableFigures();
+        ShowAvailableFigures();
     }
 
     private void Cell_OnClick(Vector2Int position)
     {
-        if (IsGameEnd)
+        if (_isGameEnd)
         {
             return;
         }
@@ -67,20 +73,33 @@ public class GameManager : MonoBehaviour
         {
             if (TryTurn(position))
             {
-                _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
-                OnTeamChange?.Invoke(_currenTeamTurn);
+                ChangeTeam();
+                _availableFigures.Clear();
+
+                // Завершение хода
+                // ТУДУ: Проверять возможные шашки для хода. Сначала атакующие, если таких нет, то обычные.
+                _availableFigures = GetAvailableFigures();
+                ShowAvailableFigures();
             }
-            
+
             IsFigureChose = false;
             _availableTurns.Clear();
+            ShowAvailableFigures();
         }
         else
         {
             Figure figure = _board.GetFigureByPosition(position);
 
-            if (figure != null && figure.Team == _currenTeamTurn)
+            if (_availableFigures.Contains(position) && figure != null && figure.Team == _currenTeamTurn)
             {
-                _availableTurns = _figureMovement.GetTurns(figure, position);
+                _availableTurns = _figureMovement.GetAttackTurns(figure, position);
+
+                if (_availableTurns.Count == 0)
+                {
+                    _availableTurns = _figureMovement.GetSimpleTurns(figure, position);
+                }
+
+                HideAvailableFigures();
                 ShowAvailableTurns();
 
                 if (_availableTurns.Count > 0)
@@ -92,23 +111,56 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private List<Vector2Int> GetAvailableFigures()
+    {
+        List<Vector2Int> simpleFigures = new List<Vector2Int>();
+        List<Vector2Int> attackFigures = new List<Vector2Int>();
+
+        for (int x = 0; x < _board.Size.x; x++)
+        {
+            for (int y = 0; y < _board.Size.y; y++)
+            {
+                Vector2Int position = new Vector2Int(x, y);
+                Figure fig = _board.GetFigureByPosition(position);
+
+                if (fig != null && fig.Team == _currenTeamTurn)
+                {
+                    if (_figureMovement.GetSimpleTurns(fig, position).Count > 0)
+                    {
+                        simpleFigures.Add(position);
+                    }
+
+                    if (_figureMovement.GetAttackTurns(fig, position).Count > 0)
+                    {
+                        attackFigures.Add(position);
+                    }
+                }
+            }
+        }
+
+        if (attackFigures.Count > 0)
+        {
+            return attackFigures;
+        }
+
+        return simpleFigures;
+    }
+
     private void Board_OnDeleteFigure(Vector2Int position)
     {
         if (_board.WhiteCheckersCount == 0)
         {
             OnGameEnd?.Invoke(Team.White);
-            IsGameEnd = true;
-            return;
+            _isGameEnd = true;
         }
         else if (_board.BlackCheckersCount == 0)
         {
             OnGameEnd?.Invoke(Team.Black);
-            IsGameEnd = true;
-            return;
+            _isGameEnd = true;
         }
         else
         {
-            Debug.LogError("Game is end but anyone has 0 checkers!");
+
         }
     }
 
@@ -121,6 +173,12 @@ public class GameManager : MonoBehaviour
         }
 
         return false;
+    }
+
+    private void ChangeTeam()
+    {
+        _currenTeamTurn = (Team)(((int)_currenTeamTurn + 1) % Enum.GetValues(typeof(Team)).Length);
+        OnTeamChange?.Invoke(_currenTeamTurn);
     }
 
     private void ShowAvailableTurns()
@@ -145,6 +203,28 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void ShowAvailableFigures()
+    {
+        foreach (Vector2Int pos in _availableFigures)
+        {
+            if (_cellsContainer.GetChild(pos.x * _board.Size.y + pos.y).TryGetComponent(out Cell cell))
+            {
+                cell.ShowActiveFigure();
+            }
+        }
+    }
+
+    private void HideAvailableFigures()
+    {
+        foreach (Vector2Int pos in _availableFigures)
+        {
+            if (_cellsContainer.GetChild(pos.x * _board.Size.y + pos.y).TryGetComponent(out Cell cell))
+            {
+                cell.HideActiveFigure();
+            }
+        }
+    }
+
     private void UnsubscribeFromCells()
     {
         for (int i = 0; i < _cellsContainer.childCount; i++)
@@ -155,4 +235,10 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+}
+
+public enum TurnState
+{
+    Simple,
+    Attack
 }

@@ -7,6 +7,7 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
 
     [SerializeField] private GameObject _selectedPlane;
     [SerializeField] private GameObject _turnPlane;
+    [SerializeField] private GameObject _activeFigure;
 
     public Vector2Int Position { get; private set; }
 
@@ -39,5 +40,15 @@ public class Cell : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IP
     public void HideTurnPanel()
     {
         _turnPlane.SetActive(false);
+    }
+
+    public void ShowActiveFigure()
+    {
+        _activeFigure.SetActive(true);
+    }
+
+    public void HideActiveFigure()
+    {
+        _activeFigure.SetActive(false);
     }
 }

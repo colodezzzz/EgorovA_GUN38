@@ -19,10 +19,12 @@ namespace Utils
             switch (figure.Type)
             {
                 case FigureType.Checker:
-                    return GetCheckerTurns(figure, position);
+                    turns.AddRange(GetCheckerTurns(figure, position));
+                    break;
 
                 case FigureType.King:
-                    return GetKingTurns(figure, position);
+                    turns.AddRange(GetKingTurns(figure, position));
+                    break;
 
                 case FigureType.None:
                 default:
@@ -33,6 +35,75 @@ namespace Utils
             return turns;
         }
 
+        public List<Vector2Int> GetAllTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+
+            switch (figure.Type)
+            {
+                case FigureType.Checker:
+                    turns.AddRange(GetCheckerSimpleTurns(figure, position));
+                    turns.AddRange(GetCheckerAttackTurns(figure, position));
+                    break;
+
+                case FigureType.King:
+                    turns.AddRange(GetKingSimpleTurns(figure, position));
+                    turns.AddRange(GetKingAttackTurns(figure, position));
+                    break;
+
+                case FigureType.None:
+                default:
+                    Debug.LogError("Unknown or None type of figure!");
+                    break;
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetSimpleTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+
+            switch (figure.Type)
+            {
+                case FigureType.Checker:
+                    return GetCheckerSimpleTurns(figure, position);
+
+                case FigureType.King:
+                    return GetKingSimpleTurns(figure, position);
+
+                case FigureType.None:
+                default:
+                    Debug.LogError("Unknown or None type of figure!");
+                    break;
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetAttackTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+
+            switch (figure.Type)
+            {
+                case FigureType.Checker:
+                    return GetCheckerAttackTurns(figure, position);
+
+                case FigureType.King:
+                    return GetKingAttackTurns(figure, position);
+
+                case FigureType.None:
+                default:
+                    Debug.LogError("Unknown or None type of figure!");
+                    break;
+            }
+
+            return turns;
+        }
+
+        #region OldTurns
+        // Old turns
         private List<Vector2Int> GetCheckerTurns(Figure figure, Vector2Int position)
         {
             List<Vector2Int> turns = new List<Vector2Int>();
@@ -173,5 +244,224 @@ namespace Utils
 
             return turns;
         }
+
+        #endregion
+
+        #region SimpleTurns
+        // Simple turns
+        public List<Vector2Int> GetCheckerSimpleTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int direction;
+
+            if (figure.Team == Team.Black)
+            {
+                // Äâèæåíèå ÂÍÈÇ-ÂËÅÂÎ
+                direction = new Vector2Int(+1, -1);
+                turns.AddRange(GetCheckerSimpleTurnsByDirection(figure, position, direction, false));
+
+                // Äâèæåíèå ÂÍÈÇ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(+1, +1);
+                turns.AddRange(GetCheckerSimpleTurnsByDirection(figure, position, direction, false));
+            }
+            else if (figure.Team == Team.White)
+            {
+                // Äâèæåíèå ÂÂÅĞÕ-ÂËÅÂÎ
+                direction = new Vector2Int(-1, -1);
+                turns.AddRange(GetCheckerSimpleTurnsByDirection(figure, position, direction, false));
+
+                // Äâèæåíèå ÂÂÅĞÕ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(-1, +1);
+                turns.AddRange(GetCheckerSimpleTurnsByDirection(figure, position, direction, false));
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetKingSimpleTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int direction;
+
+            // Äâèæåíèå ÂÍÈÇ-ÂËÅÂÎ
+            direction = new Vector2Int(+1, -1);
+            turns.AddRange(GetKingSimpleTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÍÈÇ-ÂÏĞÀÂÎ
+            direction = new Vector2Int(+1, +1);
+            turns.AddRange(GetKingSimpleTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÂÅĞÕ-ÂËÅÂÎ
+            direction = new Vector2Int(-1, -1);
+            turns.AddRange(GetKingSimpleTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÂÅĞÕ-ÂÏĞÀÂÎ
+            direction = new Vector2Int(-1, +1);
+            turns.AddRange(GetKingSimpleTurnsByDirection(figure, position, direction));
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetCheckerSimpleTurnsByDirection(Figure figure, Vector2Int position, Vector2Int direction, bool isOpposite)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int newPosition = position;
+
+            newPosition += direction;
+
+            if (_board.IsPositionCorrect(newPosition))
+            {
+                Figure figureOnNewPosition = _board.GetFigureByPosition(newPosition);
+
+                if (figureOnNewPosition == null)
+                {
+                    turns.Add(newPosition);
+                }
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetKingSimpleTurnsByDirection(Figure figure, Vector2Int position, Vector2Int direction)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int newPosition = position;
+            newPosition += direction;
+
+            while (_board.IsPositionCorrect(newPosition) && _board.GetFigureByPosition(newPosition) == null)
+            {
+                turns.Add(newPosition);
+                newPosition += direction;
+            }
+
+            return turns;
+        }
+
+        #endregion
+
+        #region AttackTurns
+        // Attack turns
+        public List<Vector2Int> GetCheckerAttackTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int direction;
+
+            if (figure.Team == Team.Black)
+            {
+                // Äâèæåíèå ÂÍÈÇ-ÂËÅÂÎ
+                direction = new Vector2Int(+1, -1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÍÈÇ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(+1, +1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÂÅĞÕ-ÂËÅÂÎ
+                direction = new Vector2Int(-1, -1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÂÅĞÕ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(-1, +1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+            }
+            else if (figure.Team == Team.White)
+            {
+                // Äâèæåíèå ÂÍÈÇ-ÂËÅÂÎ
+                direction = new Vector2Int(+1, -1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÍÈÇ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(+1, +1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÂÅĞÕ-ÂËÅÂÎ
+                direction = new Vector2Int(-1, -1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+
+                // Äâèæåíèå ÂÂÅĞÕ-ÂÏĞÀÂÎ
+                direction = new Vector2Int(-1, +1);
+                turns.AddRange(GetCheckerAttackTurnsByDirection(figure, position, direction));
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetCheckerAttackTurnsByDirection(Figure figure, Vector2Int position, Vector2Int direction)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int newPosition = position;
+
+            newPosition += direction;
+
+            if (_board.IsPositionCorrect(newPosition))
+            {
+                Figure figureOnNewPosition = _board.GetFigureByPosition(newPosition);
+
+                if (figureOnNewPosition != null && figureOnNewPosition.Team != figure.Team)
+                {
+                    newPosition += direction;
+
+                    if (_board.IsPositionCorrect(newPosition) && _board.GetFigureByPosition(newPosition) == null)
+                    {
+                        turns.Add(newPosition);
+                    }
+                }
+            }
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetKingAttackTurns(Figure figure, Vector2Int position)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int direction;
+
+            // Äâèæåíèå ÂÍÈÇ-ÂËÅÂÎ
+            direction = new Vector2Int(+1, -1);
+            turns.AddRange(GetKingAttackTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÍÈÇ-ÂÏĞÀÂÎ
+            direction = new Vector2Int(+1, +1);
+            turns.AddRange(GetKingAttackTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÂÅĞÕ-ÂËÅÂÎ
+            direction = new Vector2Int(-1, -1);
+            turns.AddRange(GetKingAttackTurnsByDirection(figure, position, direction));
+
+            // Äâèæåíèå ÂÂÅĞÕ-ÂÏĞÀÂÎ
+            direction = new Vector2Int(-1, +1);
+            turns.AddRange(GetKingAttackTurnsByDirection(figure, position, direction));
+
+            return turns;
+        }
+
+        public List<Vector2Int> GetKingAttackTurnsByDirection(Figure figure, Vector2Int position, Vector2Int direction)
+        {
+            List<Vector2Int> turns = new List<Vector2Int>();
+            Vector2Int newPosition = position;
+            newPosition += direction;
+
+            while (_board.IsPositionCorrect(newPosition) && _board.GetFigureByPosition(newPosition) == null)
+            {
+                newPosition += direction;
+            }
+
+            if (_board.IsPositionCorrect(newPosition))
+            {
+                if (_board.GetFigureByPosition(newPosition).Team != figure.Team)
+                {
+                    newPosition += direction;
+
+                    if (_board.IsPositionCorrect(newPosition) && _board.GetFigureByPosition(newPosition) == null)
+                    {
+                        turns.Add(newPosition);
+                    }
+                }
+            }
+
+            return turns;
+        }
+
+        #endregion
     }
 }

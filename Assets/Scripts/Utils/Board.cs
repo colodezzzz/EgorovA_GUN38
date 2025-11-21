@@ -135,7 +135,6 @@ namespace Utils
                 return;
             }
 
-            // Превратить шашку в дамку
             Figure figure = GetFigureByPosition(position);
             figure.Type = FigureType.King;
 
