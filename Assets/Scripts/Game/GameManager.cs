@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Utils;
-using static UnityEditor.PlayerSettings;
+using Zenject;
 
 public class GameManager : MonoBehaviour
 {
@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private Board _board;
 
     private FigureMovement _figureMovement;
-    private bool IsFigureChose = false;
+    private bool _isFigureChose = false;
     private Vector2Int _choseFigurePosition;
 
     private List<Vector2Int> _availableTurns = new List<Vector2Int>();
@@ -29,6 +29,9 @@ public class GameManager : MonoBehaviour
     private bool _isGameEnd;
     private TurnState _currentTurnState = TurnState.Simple;
 
+    [Inject]
+    private Controls _controls;
+
     private void Awake()
     {
         Vector2Int size = new Vector2Int(_boardSize.y, _boardSize.x);
@@ -37,6 +40,15 @@ public class GameManager : MonoBehaviour
         _board.OnDeleteFigure += Board_OnDeleteFigure;
 
         _figureMovement = new FigureMovement(_board);
+
+        _controls.Game.Cancel.Enable();
+
+        _controls.Game.Cancel.performed += Cancel_performed;
+    }
+
+    private void Cancel_performed(UnityEngine.InputSystem.InputAction.CallbackContext obj)
+    {
+        CancelChoice();
     }
 
     private void Start()
@@ -69,7 +81,7 @@ public class GameManager : MonoBehaviour
 
         HideAvailableTurns();
 
-        if (IsFigureChose)
+        if (_isFigureChose)
         {
             if (TryTurn(position))
             {
@@ -87,14 +99,10 @@ public class GameManager : MonoBehaviour
                     ChangeTeam();
                 }
                 
-                // Завершение хода
                 _availableFigures = GetAvailableFigures();
-                ShowAvailableFigures();
             }
 
-            IsFigureChose = false;
-            _availableTurns.Clear();
-            ShowAvailableFigures();
+            CancelChoice();
         }
         else
         {
@@ -117,7 +125,7 @@ public class GameManager : MonoBehaviour
                 if (_availableTurns.Count > 0)
                 {
                     _choseFigurePosition = position;
-                    IsFigureChose = true;
+                    _isFigureChose = true;
                 }
             }
         }
@@ -242,6 +250,18 @@ public class GameManager : MonoBehaviour
             {
                 cell.HideActiveFigure();
             }
+        }
+    }
+
+    private void CancelChoice()
+    {
+        HideAvailableTurns();
+
+        if (_isFigureChose)
+        {
+            _isFigureChose = false;
+            _availableTurns.Clear();
+            ShowAvailableFigures();
         }
     }
 

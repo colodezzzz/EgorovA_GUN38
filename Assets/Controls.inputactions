@@ -11,6 +11,24 @@
                     "id": "8b73deae-b982-489a-b012-363295029ace",
                     "expectedControlType": "",
                     "processors": "",
+                    "interactions": "Hold(duration=2.1)",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Cancel",
+                    "type": "Button",
+                    "id": "2a0df29c-e814-4eaf-b80d-f0c96297d42f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Confirm",
+                    "type": "Button",
+                    "id": "30e4307e-9f56-49f9-955e-a935767a9793",
+                    "expectedControlType": "",
+                    "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
                 }
@@ -18,12 +36,34 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "61ca69c0-d73c-41ff-993d-1cd84498d90e",
-                    "path": "",
+                    "id": "bd9c4088-d7cd-4d3b-b92b-6065686264a8",
+                    "path": "<Keyboard>/tab",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
                     "action": "Restart",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c6463538-9600-43b9-9206-63163d9f2c53",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Cancel",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26f66486-40d7-450d-860c-4b3ce01ba42a",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Confirm",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

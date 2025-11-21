@@ -29,16 +29,6 @@ namespace Utils
 
             string[] boardString =
             {
-                "bnnnnnnn",
-                "nnnnnnnn",
-                "nnwnnbnn",
-                "nnnnnnbn",
-                "nnnnnnnw",
-                "nnnnnnnn",
-                "nnnnnnnn",
-                "nnnnnnnn",
-            };
-            /*{
                 "nbnbnbnb",
                 "bnbnbnbn",
                 "nbnbnbnb",
@@ -47,7 +37,7 @@ namespace Utils
                 "wnwnwnwn",
                 "nwnwnwnw",
                 "wnwnwnwn",
-            };*/
+            };
 
             Fill(boardString);
 
